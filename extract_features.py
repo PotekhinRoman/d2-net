@@ -33,7 +33,7 @@ parser.add_argument(
     help='image preprocessing (caffe or torch)'
 )
 parser.add_argument(
-    '--model_file', type=str, default='models/d2_tf.pth',
+    '--model_file', type=str, default='d2-net/models/d2_tf.pth',
     help='path to the full model'
 )
 
@@ -45,7 +45,10 @@ parser.add_argument(
     '--max_sum_edges', type=int, default=2800,
     help='maximum sum of image sizes at network input'
 )
-
+parser.add_argument(
+    '--output_path', type=str, default='',
+    help='output path'
+)
 parser.add_argument(
     '--output_extension', type=str, default='.d2-net',
     help='extension for the output'
@@ -83,7 +86,10 @@ with open(args.image_list_file, 'r') as f:
     lines = f.readlines()
 for line in tqdm(lines, total=len(lines)):
     path = line.strip()
-
+    if args.output_path is '':
+        output_path = os.path.basename(path)
+    else:
+        output_path = os.path.join(args.output_path, os.path.basename(path))
     image = imageio.imread(path)
     if len(image.shape) == 2:
         image = image[:, :, np.newaxis]
@@ -135,7 +141,7 @@ for line in tqdm(lines, total=len(lines)):
     keypoints = keypoints[:, [1, 0, 2]]
 
     if args.output_type == 'npz':
-        with open(path + args.output_extension, 'wb') as output_file:
+        with open(output_path + args.output_extension, 'wb') as output_file:
             np.savez(
                 output_file,
                 keypoints=keypoints,
@@ -143,7 +149,7 @@ for line in tqdm(lines, total=len(lines)):
                 descriptors=descriptors
             )
     elif args.output_type == 'mat':
-        with open(path + args.output_extension, 'wb') as output_file:
+        with open(output_path + args.output_extension, 'wb') as output_file:
             scipy.io.savemat(
                 output_file,
                 {
