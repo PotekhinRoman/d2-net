@@ -84,9 +84,10 @@ model = D2Net(
 )
 
 # Process the file
-with open(args.image_list_file, 'r') as f:
-    lines = f.readlines()
-for line in tqdm(lines, total=len(lines)):
+def predict(line):
+#     with open(args.image_list_file, 'r') as f:
+#         lines = f.readlines()
+#     for line in tqdm(lines, total=len(lines)):
     path = line.strip()
     if args.output_path is '':
         output_path = os.path.basename(path)
@@ -141,24 +142,24 @@ for line in tqdm(lines, total=len(lines)):
     keypoints[:, 1] *= fact_j
     # i, j -> u, v
     keypoints = keypoints[:, [1, 0, 2]]
-
-    if args.output_type == 'npz':
-        with open(output_path + args.output_extension, 'wb') as output_file:
-            np.savez(
-                output_file,
-                keypoints=keypoints,
-                scores=scores,
-                descriptors=descriptors
-            )
-    elif args.output_type == 'mat':
-        with open(output_path + args.output_extension, 'wb') as output_file:
-            scipy.io.savemat(
-                output_file,
-                {
-                    'keypoints': keypoints,
-                    'scores': scores,
-                    'descriptors': descriptors
-                }
-            )
-    else:
-        raise ValueError('Unknown output type.')
+    return keypoints, scores, descriptors
+#     if args.output_type == 'npz':
+#         with open(output_path + args.output_extension, 'wb') as output_file:
+#             np.savez(
+#                 output_file,
+#                 keypoints=keypoints,
+#                 scores=scores,
+#                 descriptors=descriptors
+#             )
+#     elif args.output_type == 'mat':
+#         with open(output_path + args.output_extension, 'wb') as output_file:
+#             scipy.io.savemat(
+#                 output_file,
+#                 {
+#                     'keypoints': keypoints,
+#                     'scores': scores,
+#                     'descriptors': descriptors
+#                 }
+# #             )
+#     else:
+#         raise ValueError('Unknown output type.')
